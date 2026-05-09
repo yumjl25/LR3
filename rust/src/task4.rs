@@ -4,7 +4,7 @@ fn main() {
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
     let mut iter = input.split_whitespace();
-    let n: usize = iter.next().unwrap().parse().unwrap();
+    let n: usize = iter.next().unwrap().parse().unwrap(); //достает следующий элемент
     let m: usize = iter.next().unwrap().parse().unwrap();
     
     let mut a = Vec::with_capacity(n);

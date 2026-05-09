@@ -1,69 +1,77 @@
 #include <iostream>
+#include <vector>
 #include <string>
-#include <numeric> 
+#include <numeric>
+#include <cstdint>
+
 using namespace std;
 
+// НОД для беззнаковых чисел
+uint64_t gcd(uint64_t a, uint64_t b) {
+    while (b != 0) {
+        uint64_t t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+// Рекуррентное вычисление коэффициентов Эйлера
+// Возвращает вектор E(a, k) для k = 0..a-1
+vector<uint64_t> eulerCoeff(int a) {
+    if (a < 1) return {};
+    // Треугольник Эйлера: строки от 1 до a
+    vector<vector<uint64_t>> triangle(a + 1);
+    
+    for (int n = 1; n <= a; n++) {
+        triangle[n].resize(n);
+        triangle[n][0] = 1;           // первый элемент всегда 1
+        triangle[n][n - 1] = 1;       // последний элемент всегда 1
+        
+        for (int k = 1; k < n - 1; k++) {
+            // E(n, k) = (n - k) * E(n-1, k-1) + (k + 1) * E(n-1, k)
+            triangle[n][k] = (n - k) * triangle[n - 1][k - 1] 
+                           + (k + 1) * triangle[n - 1][k];
+        }
+    }
+    
+    return triangle[a];
+}
+
 // Функция сокращения дроби
-void reduce(long long& num, long long& den) {
-    long long g = gcd(num, den);
+void reduce(uint64_t& num, uint64_t& den) {
+    uint64_t g = gcd(num, den);
     num /= g;
     den /= g;
 }
 
+// Вычисление суммы ряда
 string computeSum(int a, int b) {
     if (b == 1) {
         return "infinity";
     }
-
-    long long numerator = 0;
-    long long denominator = 1;
-    long long bb = b; 
-
-    // Числитель по формуле: b * A_a(b)
-    switch (a) {
-        case 1:
-            numerator = bb;
-            break;
-        case 2:
-            numerator = bb * (bb + 1);
-            break;
-        case 3:
-            numerator = bb * (bb*bb + 4*bb + 1);
-            break;
-        case 4:
-            numerator = bb * (bb*bb*bb + 11*bb*bb + 11*bb + 1);
-            break;
-        case 5:
-            numerator = bb * (bb*bb*bb*bb + 26*bb*bb*bb + 66*bb*bb + 26*bb + 1);
-            break;
-        case 6:
-            numerator = bb * (bb*bb*bb*bb*bb + 57*bb*bb*bb*bb + 302*bb*bb*bb + 302*bb*bb + 57*bb + 1);
-            break;
-        case 7:
-            numerator = bb * (bb*bb*bb*bb*bb*bb + 120*bb*bb*bb*bb*bb + 1191*bb*bb*bb*bb + 2416*bb*bb*bb + 1191*bb*bb + 120*bb + 1);
-            break;
-        case 8:
-            numerator = bb * (bb*bb*bb*bb*bb*bb*bb + 247*bb*bb*bb*bb*bb*bb + 4293*bb*bb*bb*bb*bb + 15619*bb*bb*bb*bb + 15619*bb*bb*bb + 4293*bb*bb + 247*bb + 1);
-            break;
-        case 9:
-            numerator = bb * (bb*bb*bb*bb*bb*bb*bb*bb + 502*bb*bb*bb*bb*bb*bb*bb + 14608*bb*bb*bb*bb*bb*bb + 88234*bb*bb*bb*bb*bb + 88234*bb*bb*bb*bb + 14608*bb*bb*bb + 502*bb*bb + bb + 1);
-            break;
-        case 10:
-            numerator = bb * (bb*bb*bb*bb*bb*bb*bb*bb*bb + 1013*bb*bb*bb*bb*bb*bb*bb*bb + 47840*bb*bb*bb*bb*bb*bb*bb + 455192*bb*bb*bb*bb*bb*bb + 1310354*bb*bb*bb*bb*bb + 1310354*bb*bb*bb*bb + 455192*bb*bb*bb + 47840*bb*bb + 1013*bb + 1);
-            break;
-        default:
-            return "infinity";
+    
+    uint64_t bb = b;
+    
+    // Получаем коэффициенты Эйлера для данного a
+    vector<uint64_t> coeff = eulerCoeff(a);
+    
+    // Вычисляем A_a(b) = sum_{k=0}^{a-1} coeff[k] * b^k
+    uint64_t A = 0;
+    uint64_t power = 1;  // b^0
+    for (int k = 0; k < a; k++) {
+        A += coeff[k] * power;
+        power *= bb;  // переходим к следующей степени b
     }
-
-    // Знаменатель: (b - 1)^(a + 1)
-    denominator = 1;
-    for (int i = 0; i < a + 1; ++i) {
-        denominator *= (b - 1);
+    
+    uint64_t numerator = bb * A;
+    uint64_t denominator = 1;
+    for (int i = 0; i < a + 1; i++) {
+        denominator *= (bb - 1);
     }
-
-    // Сокращаем дробь
+    
     reduce(numerator, denominator);
-
+    
     return to_string(numerator) + "/" + to_string(denominator);
 }
 

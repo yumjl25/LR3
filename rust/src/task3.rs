@@ -1,6 +1,5 @@
 use std::io;
 
-// НОД для сокращения дроби
 fn gcd(mut a: i64, mut b: i64) -> i64 {
     while b != 0 {
         let t = b;
@@ -16,36 +15,55 @@ fn reduce(num: &mut i64, den: &mut i64) {
     *den /= g;
 }
 
+fn euler_coeff(a: usize) -> Vec<i64> {
+    if a == 0 {
+        return vec![];
+    }
+    
+    let mut triangle: Vec<Vec<i64>> = vec![vec![]; a + 1];
+    
+    for n in 1..=a {
+        triangle[n] = vec![0; n];
+        triangle[n][0] = 1;
+        triangle[n][n - 1] = 1;
+        
+        for k in 1..n - 1 {
+            triangle[n][k] = (n - k) as i64 * triangle[n - 1][k - 1]
+                           + (k + 1) as i64 * triangle[n - 1][k];
+        }
+    }
+    
+    triangle[a].clone()
+}
+
 fn compute_sum(a: i32, b: i32) -> String {
     if b == 1 {
         return "infinity".to_string();
     }
-
-    let b = b as i64;
-    let numerator = match a {
-        1 => b,
-        2 => b * (b + 1),
-        3 => b * (b * b + 4 * b + 1),
-        4 => b * (b * b * b + 11 * b * b + 11 * b + 1),
-        5 => b * (b * b * b * b + 26 * b * b * b + 66 * b * b + 26 * b + 1),
-        6 => b * (b * b * b * b * b + 57 * b * b * b * b + 302 * b * b * b + 302 * b * b + 57 * b + 1),
-        7 => b * (b * b * b * b * b * b + 120 * b * b * b * b * b + 1191 * b * b * b * b + 2416 * b * b * b + 1191 * b * b + 120 * b + 1),
-        8 => b * (b * b * b * b * b * b * b + 247 * b * b * b * b * b * b + 4293 * b * b * b * b * b + 15619 * b * b * b * b + 15619 * b * b * b + 4293 * b * b + 247 * b + 1),
-        9 => b * (b * b * b * b * b * b * b * b + 502 * b * b * b * b * b * b * b + 14608 * b * b * b * b * b * b + 88234 * b * b * b * b * b + 88234 * b * b * b * b + 14608 * b * b * b + 502 * b * b + b + 1),
-        10 => b * (b * b * b * b * b * b * b * b * b + 1013 * b * b * b * b * b * b * b * b + 47840 * b * b * b * b * b * b * b + 455192 * b * b * b * b * b * b + 1310354 * b * b * b * b * b + 1310354 * b * b * b * b + 455192 * b * b * b + 47840 * b * b + 1013 * b + 1),
-        _ => return "infinity".to_string(),
-    };
-
-    // Знаменатель: (b - 1)^(a + 1)
+    
+    let a_usize = a as usize;
+    let bb = b as i64;
+    
+    let coeff = euler_coeff(a_usize);
+    
+    let mut a = 0i64;
+    let mut power = 1i64;
+    for k in 0..a_usize {
+        a += coeff[k] * power;
+        power *= bb;
+    }
+    
+    let numerator = bb * a;
+    
     let mut denominator = 1i64;
     for _ in 0..(a + 1) {
-        denominator *= b - 1;
+        denominator *= bb - 1;
     }
-
+    
     let mut num = numerator;
     let mut den = denominator;
     reduce(&mut num, &mut den);
-
+    
     format!("{}/{}", num, den)
 }
 

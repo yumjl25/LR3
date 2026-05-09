@@ -9,7 +9,7 @@ vector<double> x;
 vector<double> y;
 int n = 10;
 
-// Функция cofe - вычисляет координаты x и y графика остывания кофе
+// Функция coffe - вычисляет координаты x и y графика остывания кофе
 int coffe(double Tk, double Tsr, double r) {
     x.clear();
     y.clear();
@@ -20,14 +20,14 @@ int coffe(double Tk, double Tsr, double r) {
         double T = Tsr + (Tk - Tsr) * exp(-r * t);
         y.push_back(T);
         
-        if (i < 3) t += 10;
+        if (i < 3) t += 10; //интервалы времени
         else if (i < 6) t += 20;
         else t += 30;
     }
     return 1;
 }
 
-// Функция argox - вычисляет коэффициенты аппроксимирующей прямой a и b
+// Функция aprox - вычисляет коэффициенты аппроксимирующей прямой a и b
 int aprox(double& a, double& b) {
     double sum_x = 0, sum_y = 0, sum_xy = 0, sum_x2 = 0;
     
@@ -44,7 +44,7 @@ int aprox(double& a, double& b) {
     return 1;
 }
 
-// Функция korte - вычисляет коэффициент корреляции
+// Функция korrel - вычисляет коэффициент корреляции
 double korrel() {
     double mean_x = 0, mean_y = 0;
     

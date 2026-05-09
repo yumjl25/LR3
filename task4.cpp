@@ -1,44 +1,45 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cstdint>
+#include <climits>
 using namespace std;
 
 int main() {
     int n, m;
     cin >> n >> m;
     
-    vector<long long> a(n);
+    vector<int64_t> a(n);  // Используем int64_t, потому что числа могут быть отрицательными
     for (int i = 0; i < n; ++i) {
         cin >> a[i];
     }
     
-    // Префиксные суммы для быстрого подсчёта суммы отрезка
-    vector<long long> prefix(n + 1, 0);
+    vector<int64_t> prefix(n + 1, 0);
     for (int i = 0; i < n; ++i) {
         prefix[i + 1] = prefix[i] + a[i];
     }
     
-    long long scorePavel = 0, scoreVika = 0;
-    int pos = 0; 
-    int last_move = 0;     // сколько чисел стёр противник в предыдущем ходу 
+    int64_t scorePavel = 0, scoreVika = 0;
+    int pos = 0;
+    int last_move = 0;
     bool pavel_turn = true;
     
     while (pos < n) {
         int max_k = min(m, n - pos);
         int best_k = -1;
-        long long best_sum = -1e18;
+        int64_t best_sum = LLONG_MIN; 
         
         for (int k = 1; k <= max_k; ++k) {
-            // Запрет: нельзя брать столько же, сколько стёр противник в прошлом ходу
             if (k == last_move) continue;
             
-            long long sum = prefix[pos + k] - prefix[pos];
+            int64_t sum = prefix[pos + k] - prefix[pos];
+            
+            // Исправление: при равной сумме выбираем  k
             if (sum > best_sum || (sum == best_sum && k < best_k)) {
                 best_sum = sum;
                 best_k = k;
             }
         }
-        
         
         if (pavel_turn) {
             scorePavel += best_sum;
@@ -47,7 +48,7 @@ int main() {
         }
         
         pos += best_k;
-        last_move = best_k; 
+        last_move = best_k;
         pavel_turn = !pavel_turn;
     }
     

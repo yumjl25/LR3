@@ -14,3 +14,9 @@ path = "src/task3.rs"
 [[bin]]
 name = "task4"
 path = "src/task4.rs"
+
+includes
+less /usr/include/c++/13/iostream
+grep -n "cout" /usr/include/c++/13/iostream
+
+
